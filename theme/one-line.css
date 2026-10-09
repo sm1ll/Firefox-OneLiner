@@ -7,10 +7,9 @@
 	/* Button Dimensions */
 	--trailing-button-size: 32px;
 	--trailing-button-gap: 4px;
-	--titlebar-button-width: 46px;
 
-	/* Non-macOS / Windows Layout Calculations */
-	--titlebar-buttons-width-win: calc(var(--titlebar-button-width) * 3);
+	/* No window buttons (Hyprland), so no space reserved for them */
+	--titlebar-buttons-width-win: 0px;
 	--panelui-offset-win: calc(
 		var(--titlebar-buttons-width-win) + var(--trailing-button-gap)
 	);
@@ -33,30 +32,6 @@
 	--toolbox-padding-overflow-win: calc(
 		var(--ext-offset-overflow-win) + var(--trailing-button-size) +
 			var(--trailing-button-gap)
-	);
-
-	/* macOS Layout Calculations */
-	--titlebar-width-mac: 80px;
-	--panelui-offset-mac: 6px;
-	--ext-offset-mac: calc(
-		var(--panelui-offset-mac) + var(--trailing-button-size) +
-			var(--trailing-button-gap)
-	);
-	--overflow-offset-mac: calc(
-		var(--panelui-offset-mac) + var(--trailing-button-size) +
-			var(--trailing-button-gap)
-	);
-	--ext-offset-overflow-mac: calc(
-		var(--overflow-offset-mac) + var(--trailing-button-size) +
-			var(--trailing-button-gap)
-	);
-	--toolbox-padding-mac: calc(
-		var(--ext-offset-mac) + var(--trailing-button-size) +
-			var(--trailing-button-gap)
-	);
-	--toolbox-padding-overflow-mac: calc(
-		var(--ext-offset-overflow-mac) + var(--trailing-button-size) +
-			var(--trailing-button-gap) + 2px
 	);
 }
 
@@ -144,12 +119,14 @@
 	display: flex !important;
 	flex: 1 1 auto !important;
 	align-items: center !important;
+	justify-content: flex-start !important;
 	background: transparent !important;
 	width: 100% !important;
 	min-width: calc(var(--tab-min-width) + 64px) !important;
 	height: var(--toolbar-height) !important;
 }
 
+/* Tab strip fills the space; Firefox keeps the + right after the last tab */
 #tabbrowser-tabs {
 	display: flex !important;
 	flex: 1 1 auto !important;
@@ -173,6 +150,16 @@
 	min-height: var(--toolbar-height) !important;
 }
 
+/* Use the + inside the tab strip, hide the one in the nav-bar */
+#nav-bar #new-tab-button {
+	display: none !important;
+}
+
+#tabs-newtab-button {
+	display: flex !important;
+	-moz-window-dragging: no-drag !important;
+}
+
 /* Non-draggable Interactive Controls */
 #nav-bar toolbarbutton,
 #nav-bar input,
@@ -182,8 +169,7 @@
 #urlbar-container,
 #unified-extensions-button,
 #nav-bar-overflow-button,
-#PanelUI-button,
-.titlebar-buttonbox-container {
+#PanelUI-button {
 	-moz-window-dragging: no-drag !important;
 }
 
@@ -198,13 +184,11 @@
 	display: none !important;
 }
 
-/* OS Window Control Buttons & Trailing Buttons */
-.titlebar-buttonbox-container {
+/* Window control buttons (minimize / maximize / close): gone */
+.titlebar-buttonbox-container,
+#TabsToolbar .titlebar-buttonbox-container,
+.titlebar-buttonbox {
 	display: none !important;
-}
-
-#TabsToolbar .titlebar-buttonbox-container {
-	display: flex !important;
 }
 
 /* Overflow button native behaviour: strictly hidden unless overflowing */
@@ -237,190 +221,65 @@
 	max-height: var(--trailing-button-size) !important;
 }
 
-@media (-moz-platform: macos) {
-	#navigator-toolbox {
-		padding-right: var(--toolbox-padding-mac) !important;
-		padding-left: var(--titlebar-width-mac) !important;
-	}
-	#navigator-toolbox:has(
-		#nav-bar:is([overflowing="true"], [nonemptyoverflow="true"])
-	) {
-		padding-right: var(--toolbox-padding-overflow-mac) !important;
-	}
-	#TabsToolbar .titlebar-buttonbox-container {
-		display: flex !important;
-		position: absolute !important;
-		top: calc(
-			(var(--toolbar-height) - var(--trailing-button-size)) / 2
-		) !important;
-		left: 0 !important;
-		justify-content: center !important;
-		align-items: center !important;
-		z-index: 100 !important;
-		margin: 0 !important;
-		padding: 0 12px !important;
-		height: var(--trailing-button-size) !important;
-	}
-	#unified-extensions-button {
-		position: absolute !important;
-		top: calc(
-			(var(--toolbar-height) - var(--trailing-button-size)) / 2
-		) !important;
-		right: var(--ext-offset-mac) !important;
-		bottom: auto !important;
-		z-index: 100 !important;
-		height: var(--trailing-button-size) !important;
-	}
-	#navigator-toolbox:has(
-			#nav-bar:is([overflowing="true"], [nonemptyoverflow="true"])
-		)
-		#unified-extensions-button {
-		right: var(--ext-offset-overflow-mac) !important;
-	}
-	#nav-bar-overflow-button {
-		display: none !important;
-		position: absolute !important;
-		top: calc(
-			(var(--toolbar-height) - var(--trailing-button-size)) / 2
-		) !important;
-		right: var(--overflow-offset-mac) !important;
-		bottom: auto !important;
-		z-index: 100 !important;
-		height: var(--trailing-button-size) !important;
-	}
-	#nav-bar:is([overflowing="true"], [nonemptyoverflow="true"])
-		#nav-bar-overflow-button,
-	#nav-bar-overflow-button[overflowing="true"] {
-		display: flex !important;
-	}
-	#PanelUI-button {
-		display: flex !important;
-		position: absolute !important;
-		top: calc(
-			(var(--toolbar-height) - var(--trailing-button-size)) / 2
-		) !important;
-		right: var(--panelui-offset-mac) !important;
-		bottom: auto !important;
-		justify-content: center !important;
-		align-items: center !important;
-		z-index: 100 !important;
-		width: var(--trailing-button-size) !important;
-		height: var(--trailing-button-size) !important;
-	}
+#navigator-toolbox {
+	padding-right: var(--toolbox-padding-win) !important;
 }
 
-@media not (-moz-platform: macos) {
-	#navigator-toolbox {
-		padding-right: var(--toolbox-padding-win) !important;
-	}
-	#navigator-toolbox:has(
-		#nav-bar:is([overflowing="true"], [nonemptyoverflow="true"])
-	) {
-		padding-right: var(--toolbox-padding-overflow-win) !important;
-	}
-	#TabsToolbar .titlebar-buttonbox-container {
-		display: flex !important;
-		position: absolute !important;
-		top: 0 !important;
-		right: 0 !important;
-		bottom: 0 !important;
-		justify-content: flex-end !important;
-		align-items: stretch !important;
-		z-index: 100 !important;
-		margin: 0 !important;
-		padding: 0 !important;
-		height: var(--toolbar-height) !important;
-	}
-	#TabsToolbar .titlebar-buttonbox-container .titlebar-buttonbox {
-		display: flex !important;
-		align-items: stretch !important;
-		margin: 0 !important;
-		padding: 0 !important;
-		height: 100% !important;
-	}
-	#TabsToolbar .titlebar-buttonbox-container .titlebar-button {
-		display: flex !important;
-		justify-content: center !important;
-		align-items: center !important;
-		box-sizing: border-box !important;
-		margin: 0 !important;
-		border: none !important;
-		border-radius: 0 !important;
-		padding: 0 !important;
-		width: var(--titlebar-button-width) !important;
-		min-width: var(--titlebar-button-width) !important;
-		max-width: var(--titlebar-button-width) !important;
-		height: 100% !important;
-	}
-	#TabsToolbar .titlebar-buttonbox-container .titlebar-button > image,
-	#TabsToolbar
-		.titlebar-buttonbox-container
-		.titlebar-button
-		> .toolbarbutton-icon {
-		margin: 0 !important;
-		padding: 0 !important;
-	}
-	:root[sizemode="maximized"]
-		#TabsToolbar
-		.titlebar-buttonbox-container
-		.titlebar-max,
-	:root:not([sizemode="maximized"])
-		#TabsToolbar
-		.titlebar-buttonbox-container
-		.titlebar-restore {
-		display: none !important;
-	}
-	#unified-extensions-button {
-		position: absolute !important;
-		top: calc(
-			(var(--toolbar-height) - var(--trailing-button-size)) / 2
-		) !important;
-		right: var(--ext-offset-win) !important;
-		bottom: auto !important;
-		z-index: 100 !important;
-		height: var(--trailing-button-size) !important;
-	}
-	#navigator-toolbox:has(
-			#nav-bar:is([overflowing="true"], [nonemptyoverflow="true"])
-		)
-		#unified-extensions-button {
-		right: var(--ext-offset-overflow-win) !important;
-	}
-	#nav-bar-overflow-button {
-		display: none !important;
-		position: absolute !important;
-		top: calc(
-			(var(--toolbar-height) - var(--trailing-button-size)) / 2
-		) !important;
-		right: var(--overflow-offset-win) !important;
-		bottom: auto !important;
-		z-index: 100 !important;
-		height: var(--trailing-button-size) !important;
-	}
+#navigator-toolbox:has(
 	#nav-bar:is([overflowing="true"], [nonemptyoverflow="true"])
-		#nav-bar-overflow-button,
-	#nav-bar-overflow-button[overflowing="true"] {
-		display: flex !important;
-	}
-	#PanelUI-button {
-		display: flex !important;
-		position: absolute !important;
-		top: calc(
-			(var(--toolbar-height) - var(--trailing-button-size)) / 2
-		) !important;
-		right: var(--panelui-offset-win) !important;
-		bottom: auto !important;
-		justify-content: center !important;
-		align-items: center !important;
-		z-index: 100 !important;
-		width: var(--trailing-button-size) !important;
-		height: var(--trailing-button-size) !important;
-	}
+) {
+	padding-right: var(--toolbox-padding-overflow-win) !important;
 }
 
-.titlebar-buttonbox {
-	margin: 0 !important;
-	padding: 0 !important;
+#unified-extensions-button {
+	position: absolute !important;
+	top: calc(
+		(var(--toolbar-height) - var(--trailing-button-size)) / 2
+	) !important;
+	right: var(--ext-offset-win) !important;
+	bottom: auto !important;
+	z-index: 100 !important;
+	height: var(--trailing-button-size) !important;
+}
+
+#navigator-toolbox:has(
+		#nav-bar:is([overflowing="true"], [nonemptyoverflow="true"])
+	)
+	#unified-extensions-button {
+	right: var(--ext-offset-overflow-win) !important;
+}
+
+#nav-bar-overflow-button {
+	display: none !important;
+	position: absolute !important;
+	top: calc(
+		(var(--toolbar-height) - var(--trailing-button-size)) / 2
+	) !important;
+	right: var(--overflow-offset-win) !important;
+	bottom: auto !important;
+	z-index: 100 !important;
+	height: var(--trailing-button-size) !important;
+}
+
+#nav-bar:is([overflowing="true"], [nonemptyoverflow="true"])
+	#nav-bar-overflow-button,
+#nav-bar-overflow-button[overflowing="true"] {
+	display: flex !important;
+}
+
+#PanelUI-button {
+	display: flex !important;
+	position: absolute !important;
+	top: calc(
+		(var(--toolbar-height) - var(--trailing-button-size)) / 2
+	) !important;
+	right: var(--panelui-offset-win) !important;
+	bottom: auto !important;
+	justify-content: center !important;
+	align-items: center !important;
+	z-index: 100 !important;
+	width: var(--trailing-button-size) !important;
+	height: var(--trailing-button-size) !important;
 }
 
 /* Customisation Mode Container & Palette Grid Layout */
